@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import Library from "../library/library"
 import Feed from "../feed/feed"
@@ -6,12 +6,33 @@ import Favorites from "../favorites/favorites"
 import Player from "../player/player"
 import Trending from "../trending/trending"
 import Sidebar from "../../components/sidebar"
+import Login from "../auth/login"
+import { setClientToken } from "../../spotify";
 
 import "./home.css"
 
 
 export default function Home() {
-    return (
+    const [token, setToken] = useState("");
+
+    useEffect(() => {
+        const token = window.localStorage.getItem("token");
+        const hash = window.location.hash;
+        window.location.hash = "";
+        if (!token && hash) {
+            const _token = hash.split("&")[0].split("=")[1];
+            window.localStorage.setItem("token", _token);
+            setToken(_token);
+            setClientToken(_token);
+        } else {
+        setToken(token);
+        setClientToken(token);
+        }
+    }, []);
+
+    return !token ? (
+        <Login />
+    ) : (
         <Router>
         <div className="main-body">
         <Sidebar />
@@ -24,6 +45,6 @@ export default function Home() {
             </Routes>
         </div>
         </Router>
-    )
+    );
 }
 
